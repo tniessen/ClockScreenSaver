@@ -420,7 +420,7 @@ static HANDLE CreateClockFont(UINT size, PSETTINGS settings, PWSTR defFontName) 
 	return CreateFontIndirect(&lfont);
 }
 
-LONG WINAPI ScreenSaverProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+LRESULT WINAPI ScreenSaverProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	// These static variables will be initialized at WM_CREATE
 	static UINT         uTimer;
 	static HANDLE       hDefaultFont;
