@@ -118,6 +118,11 @@ static void CreateLFont(PLOGFONT font, PWSTR name, UINT height, UINT weight, BOO
 	wcscpy_s(font->lfFaceName, 32, name);
 }
 
+static void RectToSize(PRECT rect, PSIZE size) {
+	size->cx = rect->right - rect->left;
+	size->cy = rect->bottom - rect->top;
+}
+
 static void InvalidateWindow(HWND hWindow) {
 	RECT rect;
 	GetClientRect(hWindow, &rect);
@@ -171,6 +176,25 @@ static int ErrorMessageBox(HWND hWnd, PWSTR caption, UINT btnType) {
 	wsprintf(msg, TEXT("Error code: %lu\n"), GetLastError());
 
 	return MessageBox(hWnd, msg, caption, MB_ICONERROR | btnType);
+}
+
+static void CenterWindowOnDesktop(HWND hwnd) {
+	// Obtain rects
+	RECT desktopRect, windowRect;
+	GetClientRect(GetDesktopWindow(), &desktopRect);
+	GetClientRect(hwnd, &windowRect);
+
+	// Obtain sizes
+	SIZE desktopSize, windowSize;
+	RectToSize(&desktopRect, &desktopSize);
+	RectToSize(&windowRect, &windowSize);
+
+	// Calculate new position
+	int x = (desktopSize.cx - windowSize.cx) / 2;
+	int y = (desktopSize.cy - windowSize.cy) / 2;
+
+	// Apply position
+	SetWindowPos(hwnd, 0, x, y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 }
 
 BOOL WINAPI ScreenSaverConfigureDialog(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
@@ -239,6 +263,11 @@ BOOL WINAPI ScreenSaverConfigureDialog(HWND hDlg, UINT message, WPARAM wParam, L
 
 		hFgBrush = CreateSolidBrush(settings.fgColor);
 		hBgBrush = CreateSolidBrush(settings.bgColor);
+
+		// If the configuration dialog was not opened relative to another window, center it on the screen
+		if (GetParent(hDlg) == 0) {
+			CenterWindowOnDesktop(hDlg);
+		}
 
 		return TRUE;
 	case WM_COMMAND:
@@ -391,11 +420,6 @@ static void IntToTwoDigits(WORD w, PWSTR out) {
 	out[0] = '0' + (w / 10);
 	out[1] = '0' + (w % 10);
 	out[2] = '\0';
-}
-
-static void RectToSize(PRECT rect, PSIZE size) {
-	size->cx = rect->right - rect->left;
-	size->cy = rect->bottom - rect->top;
 }
 
 static HANDLE CreateClockFont(UINT size, PSETTINGS settings, PWSTR defFontName) {
