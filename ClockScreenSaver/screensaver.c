@@ -83,7 +83,7 @@ static BOOL LoadSettingsOrUseDefaults(PPROPERTIES props, PSETTINGS settings) {
 }
 
 static BOOL SaveSettings(PPROPERTIES props, PSETTINGS settings) {
-	PropertiesToSettings(settings, props);
+	SettingsToProperties(settings, props);
 	return SaveConfig(props);
 }
 
