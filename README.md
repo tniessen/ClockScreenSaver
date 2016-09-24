@@ -1,3 +1,4 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/9ippie8i83vqt62n?svg=true)](https://ci.appveyor.com/project/tniessen/clockscreensaver)
 
 # Building
 
